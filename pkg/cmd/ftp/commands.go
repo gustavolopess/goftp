@@ -1,5 +1,6 @@
 package ftp
 
 const (
-	FTP_GET = "GET"
+	FTP_GET = "get"
+	FTP_LS  = "ls"
 )
