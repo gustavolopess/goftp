@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/gustavolopess/goftp/pkg/cmd/ftp"
@@ -9,11 +8,11 @@ import (
 )
 
 func main() {
-	os.Chdir("/home/gustavo/")
+	homeDir := "/home/gustavolopess/"
 
-	fmt.Println(os.Getwd())
+	os.Chdir(homeDir)
 
-	ftpServer := ftp.NewFtpServer("/tmp/")
+	ftpServer := ftp.NewFtpServer(homeDir)
 
 	listener.Listen(8080, ftpServer.CommandHandler)
 }

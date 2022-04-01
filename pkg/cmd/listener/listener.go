@@ -7,7 +7,7 @@ import (
 	"strconv"
 )
 
-func Listen(port int, handler func(io.ReadWriter)) error {
+func Listen(port int, handler func(io.ReadWriteCloser)) error {
 	ln, err := net.Listen("tcp", ":"+strconv.Itoa(port))
 	if err != nil {
 		panic(err)

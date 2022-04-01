@@ -2,11 +2,13 @@ package ftp
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"path/filepath"
 	"strings"
 
+	"github.com/gustavolopess/goftp/pkg/cmd/cd"
 	"github.com/gustavolopess/goftp/pkg/cmd/get"
 	"github.com/gustavolopess/goftp/pkg/cmd/ls"
 )
@@ -14,7 +16,8 @@ import (
 type FtpServer interface {
 	Get(relativePath string) (string, error)
 	ListIt(relativePath string) (string, error)
-	CommandHandler(io.ReadWriter)
+	ChangeDir(dirPath string) error
+	CommandHandler(io.ReadWriteCloser)
 }
 
 type ftp struct {
@@ -30,7 +33,18 @@ func (f *ftp) Get(relativePath string) (string, error) {
 }
 
 func (f *ftp) ListIt(relativePath string) (string, error) {
-	return ls.ListIt(relativePath)
+	return ls.ListIt(filepath.Join(f.dir, relativePath))
+}
+
+func (f *ftp) ChangeDir(dirPath string) error {
+	newWorkingDir, err := cd.ChangeDir(filepath.Join(f.dir, dirPath))
+	if err != nil {
+		return err
+	}
+
+	f.dir = newWorkingDir
+
+	return nil
 }
 
 func check(err error) {
@@ -39,16 +53,14 @@ func check(err error) {
 	}
 }
 
-func (f *ftp) CommandHandler(reader io.ReadWriter) {
+func (f *ftp) CommandHandler(reader io.ReadWriteCloser) {
 	command, _ := bufio.NewReader(reader).ReadString('\n')
 
 	log.Printf("Command: %s", command)
 
 	args := strings.Split(command, " ")
 
-	log.Println(args, args[0], args[1])
-
-	switch args[0] {
+	switch strings.TrimRight(args[0], "\n ") {
 	case FTP_GET:
 		filePath := strings.TrimSpace(args[1])
 		fileContent, err := f.Get(filePath)
@@ -59,7 +71,14 @@ func (f *ftp) CommandHandler(reader io.ReadWriter) {
 		dirDescription, err := f.ListIt(dirPath)
 		check(err)
 		io.WriteString(reader, dirDescription)
-
+	case FTP_CD:
+		dirPath := strings.TrimSpace(args[1])
+		err := f.ChangeDir(dirPath)
+		check(err)
+		io.WriteString(reader, fmt.Sprintf("Current directory: %s", f.dir))
+	case FTP_CLOSE:
+		io.WriteString(reader, "Closing connection, bye!")
+		reader.Close()
 	default:
 		return
 	}
