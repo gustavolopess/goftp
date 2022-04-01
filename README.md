@@ -14,5 +14,5 @@ A simple ftp-like client and server application written in Golang.
 - [x] `cd` command
 - [x] `get` command
 - [x] `close` command
-- [] client application
+- [ ] client application
 
