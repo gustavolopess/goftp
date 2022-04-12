@@ -1,6 +1,7 @@
 package cd
 
 import (
+	"fmt"
 	"os"
 )
 
@@ -10,4 +11,8 @@ func ChangeDir(dirpath string) (string, error) {
 	}
 
 	return os.Getwd()
+}
+
+func HandleResponse(response []byte) {
+	fmt.Println(response)
 }

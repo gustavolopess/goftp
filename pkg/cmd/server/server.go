@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	homeDir := "/home/gustavolopess/"
+	homeDir := "/Users/gustavo.lopes/"
 
 	os.Chdir(homeDir)
 

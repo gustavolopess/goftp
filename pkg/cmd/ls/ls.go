@@ -2,7 +2,9 @@ package ls
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 )
 
 type DirFileDescription struct {
@@ -32,4 +34,15 @@ func ListIt(dirPath string) (string, error) {
 	}
 
 	return string(dirFilesDescriptionsJson), nil
+}
+
+func HandleResponse(response []byte) {
+	var dirs []DirFileDescription
+
+	err := json.Unmarshal(response, &dirs)
+	if err != nil {
+		log.Fatalf("Error unmarshalling response: %s\n", err)
+	}
+
+	fmt.Println(dirs)
 }
