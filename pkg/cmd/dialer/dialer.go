@@ -6,7 +6,7 @@ import (
 	"net"
 )
 
-func Dial(addr, command string, cmdHandler func(string, io.ReadWriteCloser), respHandler func(string, []byte)) {
+func Dial(addr, command string, cmdHandler func(string, io.ReadWriteCloser), respHandler func(string, []byte) error) {
 	tcpAddr, err := net.ResolveTCPAddr("tcp", addr)
 	if err != nil {
 		fmt.Println(err)

@@ -12,7 +12,7 @@ import (
 
 type FtpClient interface {
 	CommandHandler(string, io.ReadWriteCloser)
-	ResponseHandler(string, []byte)
+	ResponseHandler(string, []byte) error
 }
 
 type client struct {
@@ -28,13 +28,17 @@ func NewFtpClient() FtpClient {
 	}
 }
 
-func (c *client) ResponseHandler(command string, response []byte) {
+func (c *client) ResponseHandler(command string, response []byte) error {
 	args := strings.Split(command, " ")
 	verb := strings.TrimRight(args[0], "\n ")
 
 	if handler, ok := c.ResponseHandlers[verb]; ok {
 		handler(response)
+	} else {
+		return fmt.Errorf("no handler for verb '%v'", verb)
 	}
+
+	return nil
 }
 
 func (c *client) CommandHandler(command string, reader io.ReadWriteCloser) {
